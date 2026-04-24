@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.*
+!.env.example
+deployment_plan.md
+DEPLOYMENT_GUIDE.md
+.DS_Store
+dist/
+build/
