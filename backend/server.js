@@ -14,17 +14,23 @@ app.use(express.json());
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('MongoDB Connected (Local)');
+    console.log('MongoDB Connected successfully');
   } catch (err) {
-    console.log('Local MongoDB connection failed. Starting in-memory database...');
-    try {
-      const { MongoMemoryServer } = require('mongodb-memory-server');
-      const mongoServer = await MongoMemoryServer.create();
-      const mongoUri = mongoServer.getUri();
-      await mongoose.connect(mongoUri);
-      console.log('In-Memory MongoDB Connected');
-    } catch (fallbackErr) {
-      console.error('Failed to connect to in-memory database:', fallbackErr);
+    console.error('MongoDB connection failed:', err.message);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Starting in-memory database for local development...');
+      try {
+        const { MongoMemoryServer } = require('mongodb-memory-server');
+        const mongoServer = await MongoMemoryServer.create();
+        const mongoUri = mongoServer.getUri();
+        await mongoose.connect(mongoUri);
+        console.log('In-Memory MongoDB Connected');
+      } catch (fallbackErr) {
+        console.error('Failed to connect to in-memory database:', fallbackErr);
+        process.exit(1);
+      }
+    } else {
+      console.error('Production database connection failed. Exiting...');
       process.exit(1);
     }
   }
